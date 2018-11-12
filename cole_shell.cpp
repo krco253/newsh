@@ -17,7 +17,7 @@
 #include <map>
 #include <unistd.h> /*getcwd*/
 #include <stdio.h> /*getcwd*/
-
+#include "csapp.h" /*enviro,etc*/
 using namespace std;
 
 /* typedefs*/
@@ -36,7 +36,7 @@ strVec tokenizeCmd(string line);
 void execute_command(strVec com);
 void set_variable_value(string var, string val);
 void cd(string directory_name);
-void cmd(strVec command);
+int cmd(strVec command);
 
 /*-----------------------------------------
 |               main function
@@ -190,6 +190,7 @@ void cd(string directory_name)
 {
 	char *dir = new char[directory_name.length() +1];
 	strcpy(dir, directory_name.c_str());
+
 	int success = chdir(dir);
 	if (success == -1)
 	{
@@ -208,15 +209,67 @@ else, cmd returns -1
 */
 int cmd(strVec command)
 {
+	pid_t pid; /*process ID*/
 	int end = command.size()-1;
-	/*if this is a background process*/
-	if (command[end] == &)
+	bool bg = false; /*background process?*/
+	
+	char **c_command = new char*[command.size()];
+	for(size_t i =0; i < command.size(); i++)
 	{
-
+		c_command[i] = new char[command[i].size()+1]; //+1
+		strcpy(c_command[i],command[i].c_str());
 	}
-	else /*if this is not a background process*/
+
+	/*is this a background process?*/
+	if (command[end] == "&")
 	{
+		bg = true;
+	}
+	
+	/*child runs process*/
+	if ((pid = fork()) == 0)
+	{
+		if(execve(c_command[0],c_command,environ) < 0)
+			return -1;
+	}	
+	
+	/*Parent waits for foreground job to terminate*/
+	if(!bg)
+	{
+		int status;	
+		if(waitpid(pid,&status,0) < 0)
+			cout  << "waitpid error" << endl;
+	}
+	else
+		cout << pid << " " << command[0] <<endl; 
 
+	
+	/*free memory*/
+	for(size_t i = 0; i < command.size(); i++)
+	{
+		delete [] c_command[i];
 	}
 
+	return 0;
 }
+
+
+/*to char array
+char* toCharArray(string cppString)
+{
+	char *converted = new char[cppString.length() +1];
+	strcpy(converted, cppString.c_str());
+	return converted;
+	
+}
+
+char* toCharArray(strVec cppVec)
+{
+	char *converted = new char*[cppVec.size()];
+	
+	for(size_t i =0; i < cppVec.size(); i++)
+	{
+		converted[i] = new char[cppVec[i].size()+1];
+		strcpy(converted[i],cppVec[i].c_str());
+	}
+}*/
