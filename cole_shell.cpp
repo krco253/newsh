@@ -213,7 +213,7 @@ void cd(string directory_name)
 	}
 	else
 	{
-		cout << "Successfully changed to: " << directory_name << endl;
+		cout << "Successfully changed directory!" << endl;
 	}
 
 	delete[] dir;
@@ -243,12 +243,13 @@ int cmd(strVec command)
 
 		
 	/*convert to char array*/
-	char **c_command = new char*[command.size()];
+	char **c_command = new char*[command.size()+1];
 	for(size_t i =0; i < command.size(); i++)
 	{
-		c_command[i] = new char[command[i].size()]; 
+		c_command[i] = new char[command[i].size()+1]; 
 		strcpy(c_command[i],command[i].c_str());
 	}
+	c_command[command.size()] = NULL;
 
 	/*child runs process*/
 	pid = fork();

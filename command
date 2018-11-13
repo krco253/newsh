@@ -2,6 +2,7 @@ cd /home/
 /bin/ls -l
 cd /home/krco253/PA3/newsh/
 %/bin/echo hi
+/bin/wc file1
 set f1 file1
 set PROMPT cs270$   
 /bin/echo hi
