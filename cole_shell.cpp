@@ -20,6 +20,7 @@
 #include <unistd.h> /*getcwd*/
 #include <stdio.h> /*getcwd*/
 #include "csapp.h" /*enviro,etc*/
+
 using namespace std;
 
 /* typedefs*/
@@ -104,7 +105,7 @@ strVec tokenizeCmd(string line)
 					{
 						isVariable = true; 
 						value = it->second;
-						cout << value << endl;
+						command.push_back(value);
 						break;
 					}
 
@@ -199,12 +200,12 @@ void cd(string directory_name)
 	if(dir[0] != '/')
 	{
 		ptrpath = realpath(dir, actualpath);
-	}
-	if (ptrpath == NULL)
-	{
-		cout << "Path error" << endl;
-		return;
-	}
+		if (ptrpath == NULL)
+		{
+			cout << "Path error" << endl;
+			return;
+		}
+	}	
 	int success = chdir(dir);
 	if (success == -1)
 	{
@@ -239,12 +240,13 @@ int cmd(strVec command)
 		bg_processes.push_back(command[0]); /*add to list of background processes running*/
 		command.pop_back(); /*remove & as a token*/
 	}
-	
+
+		
 	/*convert to char array*/
 	char **c_command = new char*[command.size()];
 	for(size_t i =0; i < command.size(); i++)
 	{
-		c_command[i] = new char[command[i].size()+1]; //+1
+		c_command[i] = new char[command[i].size()]; 
 		strcpy(c_command[i],command[i].c_str());
 	}
 
@@ -252,10 +254,11 @@ int cmd(strVec command)
 	pid = fork();
 	if (pid == 0)
 	{
-		if(execve(c_command[0],c_command,environ) < 0)
+	/*	if(execve(c_command[0],c_command,environ) < 0)*/
+		if(execvp(c_command[0], c_command) <0)			
 		{
-			cout << "Command not found" << endl;
-			bg_processes.pop_back();
+			cout << "Command not known" << endl;
+			if(bg) {bg_processes.pop_back();}
 			return -1;
 		}	
 	}
@@ -282,6 +285,7 @@ int cmd(strVec command)
 
 void bp(void)
 {
+	cout << "----------------- bp -------------------" << endl;
 	if (bg_processes.size() == 0)
 	{
 		cout << "No background processes running." << endl;
