@@ -13,6 +13,8 @@
 #include <cstring>
 #include <iostream> /*cout, etc*/
 #include <sstream> /*stringstream*/
+#include <limits.h> /*realpath*/
+#include <stdlib.h> /*realpath*/
 #include <vector>
 #include <map>
 #include <unistd.h> /*getcwd*/
@@ -37,7 +39,7 @@ void execute_command(strVec com);
 void set_variable_value(string var, string val);
 void cd(string directory_name);
 int cmd(strVec command);
-
+void bp(void);
 /*-----------------------------------------
 |               main function
 -------------------------------------------
@@ -115,7 +117,8 @@ strVec tokenizeCmd(string line)
 			
 		}
 		/*if input does not begin with $*/
-		else if ((token[0] == '%'))
+		else if (token == ""){ } /*ignore if there are spaces in front of the command*/
+		else if ((token[0] == '%'))/*ignore the rest of the line if this is a comment*/
 		{ break; }
 		else
 		{
@@ -137,7 +140,6 @@ then calls that function
 void execute_command(strVec com)
 {
 
-	int command_found = 0;
 
 	if (com[0] == "set") 
 	{
@@ -147,14 +149,15 @@ void execute_command(strVec com)
 	{
 		cd(com[1]);
 	}
+	else if (com[0] == "bp")
+	{
+		bp();
+	}
 	else /*else it is not a built in command - call cmd*/
 	{
-		command_found = cmd(com);
+		cmd(com);
 	}
-	if (command_found != 0)
-	{
-		cout << "Command not found." << endl;
-	} 
+	
 }
 
 /*-----------------------------------------
@@ -190,13 +193,28 @@ void cd(string directory_name)
 {
 	char *dir = new char[directory_name.length() +1];
 	strcpy(dir, directory_name.c_str());
+	char actualpath [PATH_MAX+1];
+	char *ptrpath;
 
+	if(dir[0] != '/')
+	{
+		ptrpath = realpath(dir, actualpath);
+	}
+	if (ptrpath == NULL)
+	{
+		cout << "Path error" << endl;
+		return;
+	}
 	int success = chdir(dir);
 	if (success == -1)
 	{
 		cout << "Directory not found." << endl;
 	}
-	
+	else
+	{
+		cout << "Successfully changed to: " << directory_name << endl;
+	}
+
 	delete[] dir;
 }
 
@@ -212,7 +230,17 @@ int cmd(strVec command)
 	pid_t pid; /*process ID*/
 	int end = command.size()-1;
 	bool bg = false; /*background process?*/
+	int com_found = 0;
 	
+	/*is this a background process?*/
+	if (command[end] == "&")
+	{
+		bg = true;
+		bg_processes.push_back(command[0]); /*add to list of background processes running*/
+		command.pop_back(); /*remove & as a token*/
+	}
+	
+	/*convert to char array*/
 	char **c_command = new char*[command.size()];
 	for(size_t i =0; i < command.size(); i++)
 	{
@@ -220,21 +248,20 @@ int cmd(strVec command)
 		strcpy(c_command[i],command[i].c_str());
 	}
 
-	/*is this a background process?*/
-	if (command[end] == "&")
-	{
-		bg = true;
-	}
-	
 	/*child runs process*/
-	if ((pid = fork()) == 0)
+	pid = fork();
+	if (pid == 0)
 	{
 		if(execve(c_command[0],c_command,environ) < 0)
+		{
+			cout << "Command not found" << endl;
+			bg_processes.pop_back();
 			return -1;
-	}	
+		}	
+	}
 	
 	/*Parent waits for foreground job to terminate*/
-	if(!bg)
+	if(!bg) 
 	{
 		int status;	
 		if(waitpid(pid,&status,0) < 0)
@@ -253,6 +280,18 @@ int cmd(strVec command)
 	return 0;
 }
 
+void bp(void)
+{
+	if (bg_processes.size() == 0)
+	{
+		cout << "No background processes running." << endl;
+		return;
+	}
+	for (int i = 0; i < bg_processes.size(); i++)
+	{
+		cout <<"Number in queue: " << i << " Name: " << bg_processes[0] << endl;
+	}	
+}
 
 /*to char array
 char* toCharArray(string cppString)
