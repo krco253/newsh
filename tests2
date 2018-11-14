@@ -2,6 +2,7 @@ cd /home/krco253/PA3/newsh/
 %/bin/echo hi
 /bin/echo success
 set f3 file3
+notacommand
 set PROMPT bash$   
 /bin/echo hi
 bp

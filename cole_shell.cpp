@@ -237,16 +237,17 @@ void cd(string directory_name)
 |                     cmd
 --------------------------------------------      
 user submits a command to execute a program
-if command is executed successfully, cmd  returns 0
-else, cmd returns -1
+if command is not found, print an error message 
+and exit
 */
+
 int cmd(strVec command)
 {
 	pid_t pid; /*process ID*/
 	int end = command.size()-1;
 	bool bg = false; /*background process?*/
 	int com_found = 0;
-	
+		
 	/*is this a background process?*/
 	if (command[end] == "&")
 	{
@@ -273,7 +274,7 @@ int cmd(strVec command)
 		{
 			cout << "Command not known" << endl;
 			if(bg) {bg_processes.pop_back();}
-			return -1;
+			exit(0);
 		}	
 	}
 	

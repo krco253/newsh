@@ -2,7 +2,7 @@ newsh$ Successfully changed directory!
 newsh$ total 16
 drwxr-xr-x 20 clpike3 clpike3 4096 Aug 17 13:36 clpike3
 drwxr-xr-x  2 clpike4 clpike4 4096 Aug 17 11:38 clpike4
-drwxr-xr-x 36 krco253 krco253 4096 Nov 13 20:59 krco253
+drwxr-xr-x 36 krco253 krco253 4096 Nov 13 21:16 krco253
 drwxr-xr-x 24 ubuntu  ubuntu  4096 Aug 17 14:56 ubuntu
 newsh$ Successfully changed directory!
 newsh$ hi
@@ -10,8 +10,8 @@ newsh$ Please provide directory name.
 newsh$ Please provide an identifer and a value.
 newsh$ newsh$ cs270$ ----------------- bp -------------------
 No background processes running.
-cs270$ 22046 /bin/cat
-cs270$ 22047 /bin/cat
+cs270$ 22605 /bin/cat
+cs270$ 22606 /bin/cat
 cs270$ cs270$ ----------------- bp -------------------
 Number in queue: 0 Name: /bin/cat
 Number in queue: 1 Name: /bin/cat
