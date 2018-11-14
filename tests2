@@ -1,0 +1,12 @@
+cd /home/krco253/PA3/newsh/
+%/bin/echo hi
+/bin/echo success
+set f3 file3
+set PROMPT bash$   
+/bin/echo hi
+bp
+/bin/cat $f3 file2 file1 &
+/bin/cat file3 file2 file1 &
+bp
+cd /home/
+quit

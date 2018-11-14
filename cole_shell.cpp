@@ -123,7 +123,7 @@ strVec tokenizeCmd(string line)
 		{ break; }
 		else
 		{
-			command.push_back(token);
+			command.push_back(token);/*push the token to the strVec of the command*/
 
 		}				
 	} 		
@@ -144,10 +144,20 @@ void execute_command(strVec com)
 
 	if (com[0] == "set") 
 	{
+		if (com.size() <= 2) 
+		{
+			cout << "Please provide an identifer and a value." << endl;
+			return;
+		}
 		set_variable_value(com[1],com[2]);
 	}
 	else if (com[0] == "cd")
 	{
+		if (com.size() <= 1)
+		{ 
+			cout << "Please provide directory name." << endl; 
+			return;
+		}
 		cd(com[1]);
 	}
 	else if (com[0] == "bp")
@@ -174,9 +184,11 @@ void set_variable_value(string var, string val)
 	strPair var_val(var,val);
 	if(shell_variables.count(var) > 0)
 	{
-		shell_variables.erase(var);
+		shell_variables.erase(var); /*if the variable already exists, delete it*/
 	}
 	shell_variables.insert(var_val);
+	
+	/* if the variable was PROMPT, change shell prompt*/
 	if (var == "PROMPT")
 	{
 		shell_prompt = val + ' ';
@@ -196,17 +208,19 @@ void cd(string directory_name)
 	strcpy(dir, directory_name.c_str());
 	char actualpath [PATH_MAX+1];
 	char *ptrpath;
-
+	
+	/*if the path isn't absolute*/	
 	if(dir[0] != '/')
 	{
-		ptrpath = realpath(dir, actualpath);
+		ptrpath = realpath(dir, actualpath); /*get the absolute path*/
 		if (ptrpath == NULL)
 		{
 			cout << "Path error" << endl;
 			return;
 		}
 	}	
-	int success = chdir(dir);
+	int success = chdir(dir); /*change directory*/
+
 	if (success == -1)
 	{
 		cout << "Directory not found." << endl;
@@ -249,13 +263,12 @@ int cmd(strVec command)
 		c_command[i] = new char[command[i].size()+1]; 
 		strcpy(c_command[i],command[i].c_str());
 	}
-	c_command[command.size()] = NULL;
+	c_command[command.size()] = NULL; /*add null pointer to end of array for use by execvp*/
 
 	/*child runs process*/
 	pid = fork();
 	if (pid == 0)
 	{
-	/*	if(execve(c_command[0],c_command,environ) < 0)*/
 		if(execvp(c_command[0], c_command) <0)			
 		{
 			cout << "Command not known" << endl;
@@ -280,10 +293,16 @@ int cmd(strVec command)
 	{
 		delete [] c_command[i];
 	}
+	
 
 	return 0;
 }
 
+/*------------------------------------------
+|                     bp
+--------------------------------------------      
+displays background processes
+*/
 void bp(void)
 {
 	cout << "----------------- bp -------------------" << endl;
@@ -298,22 +317,3 @@ void bp(void)
 	}	
 }
 
-/*to char array
-char* toCharArray(string cppString)
-{
-	char *converted = new char[cppString.length() +1];
-	strcpy(converted, cppString.c_str());
-	return converted;
-	
-}
-
-char* toCharArray(strVec cppVec)
-{
-	char *converted = new char*[cppVec.size()];
-	
-	for(size_t i =0; i < cppVec.size(); i++)
-	{
-		converted[i] = new char[cppVec[i].size()+1];
-		strcpy(converted[i],cppVec[i].c_str());
-	}
-}*/

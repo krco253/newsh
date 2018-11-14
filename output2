@@ -1,0 +1,17 @@
+newsh$ Successfully changed directory!
+newsh$ newsh$ success
+newsh$ newsh$ bash$ hi
+bash$ ----------------- bp -------------------
+No background processes running.
+bash$ 22134 /bin/cat
+bash$ 22135 /bin/cat
+bash$ ----------------- bp -------------------
+Number in queue: 0 Name: /bin/cat
+Number in queue: 1 Name: /bin/cat
+bash$ Successfully changed directory!
+bash$  fren
+ sup
+hi 
+ fren
+ sup
+hi 
